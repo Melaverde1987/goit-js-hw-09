@@ -2,10 +2,16 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
+const inputs = {
+  days: document.querySelector('[data-days]'),
+  hours: document.querySelector('[data-hours]'),
+  minutes: document.querySelector('[data-minutes]'),
+  seconds: document.querySelector('[data-seconds]'),
+};
 const startBtn = document.querySelector('[data-start]');
-const dayInput = document.querySelector('[data-days]');
-const hourInput = document.querySelector('[data-hours]');
 startBtn.setAttribute('disabled', '');
+
+let timer = null;
 
 const options = {
   enableTime: true,
@@ -17,12 +23,19 @@ const options = {
       Notify.info('Please choose a date in the future');
     } else {
       startBtn.removeAttribute('disabled');
-      const timeDifference = selectedDates[0] - new Date();
-      const time = convertMs(timeDifference);
+      let timeDifference = selectedDates[0] - new Date();
+
       startBtn.addEventListener('click', () => {
-        const { days, hours, minutes, seconds } = time;
-        dayInput.textContent = addLeadingZero(days);
-        hourInput.textContent = addLeadingZero(hours);
+        timer = setInterval(() => {
+          timeDifference -= 1000;
+          const time = convertMs(timeDifference);
+          const { days, hours, minutes, seconds } = time;
+          inputs.days.textContent = addLeadingZero(days);
+          inputs.hours.textContent = addLeadingZero(hours);
+          inputs.minutes.textContent = addLeadingZero(minutes);
+          inputs.seconds.textContent = addLeadingZero(seconds);
+          timeDifference < 1000 && clearInterval(timer);
+        }, 1000);
       });
     }
   },
